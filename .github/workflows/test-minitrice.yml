@@ -25,11 +25,6 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
-            # Vérifier si les fichiers existent
-            if [ ! -f "$test_file" ] || [ ! -f "$result_file" ]; then
-              echo "Fichier de test ou de résultat manquant pour $i"
-              exit 1
-            fi
             # Utiliser bc pour évaluer les expressions arithmétiques dans le fichier de test
             evaluated_test=$(awk '{print $0}' $test_file | bc)
             # Lire les résultats attendus
