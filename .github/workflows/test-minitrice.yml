@@ -25,13 +25,21 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
-
-            # Utiliser awk pour convertir les valeurs en flottant avec la partie décimale
-            if ! diff -q <(sort <(awk '{print $0}' $test_file | bc)) <(sort <(awk '{printf "%.1f\n", $1}' $result_file)); then
+            # Vérifier si les fichiers existent
+            if [ ! -f "$test_file" ] || [ ! -f "$result_file" ]; then
+              echo "Fichier de test ou de résultat manquant pour $i"
+              exit 1
+            fi
+            # Utiliser bc pour évaluer les expressions arithmétiques dans le fichier de test
+            evaluated_test=$(awk '{print $0}' $test_file | bc)
+            # Lire les résultats attendus
+            expected_result=$(awk '{printf "%.1f\n", $1}' $result_file)
+            # Comparer les résultats évalués avec les résultats attendus
+            if [ "$evaluated_test" != "$expected_result" ]; then
               echo "Les résultats ne correspondent pas pour le fichier $i"
-              diff $test_file $result_file
+              echo "Résultat évalué : $evaluated_test"
+              echo "Résultat attendu : $expected_result"
               exit 1
             fi
           done
-
           echo "Tous les résultats sont corrects !"
