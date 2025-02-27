@@ -26,7 +26,7 @@ jobs:
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
             # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
-            evaluated_test=$(awk '{print $0}' $test_file) | python minitrice.py)
+            evaluated_test=$(awk '{print $0}' $test_file | python minitrice.py)
             # Lire les résultats attendus
             expected_result=$(awk '{print $0}' "$result_file")
             # Comparer les résultats évalués avec les résultats attendus
