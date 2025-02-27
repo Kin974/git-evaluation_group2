@@ -29,7 +29,7 @@ jobs:
             evaluated_test=$(awk '{print $0}' $test_file | python minitrice.py 2>&1)
             exit_code=$?  # Capture le code de sortie de minitrice.py
             # Lire les résultats attendus 
-            expected_result=$(awk '{print $0}' $result_file)
+            expected_result=$(awk '{printf "%.1f\n", $1}' $result_file)
 
             echo "Test file : $test_file"
             echo "Result file : $result_file"
@@ -49,16 +49,12 @@ jobs:
                 # L'erreur correspond à l'erreur attendue, donc c'est un succès
                 echo "Erreur attendue pour $i : $evaluated_test"
               fi
-            else
-              # Comparer les résultats ligne par ligne pour éviter les erreurs de format
-              paste <(echo "$evaluated_test") <(echo "$expected_result") | while IFS=$'\t' read -r eval_line exp_line; do
-                if [ "$eval_line" != "$exp_line" ]; then
-                  echo "Les résultats ne correspondent pas pour le fichier $i"
-                  echo "Ligne évaluée   : $eval_line"
-                  echo "Ligne attendue   : $exp_line"
-                  exit 1
-                fi
-              done
+           else
+              # Comparer les résultats après formatage
+              if ! diff <(echo "$evaluated_test") <(echo "$expected_result"); then
+                echo "Les résultats ne correspondent pas pour le fichier $i"
+                exit 1
+              fi
             fi
           done
           echo "Tous les résultats sont corrects !"
