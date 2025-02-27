@@ -26,9 +26,9 @@ jobs:
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
             # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
-            evaluated_test=$ <(sort <(awk '{print $0}' $test_file)) | python minitrice.py)
+            evaluated_test=$(awk '{print $0}' $test_file)) | python minitrice.py)
             # Lire les résultats attendus
-            expected_result=$(echo "$result_file")
+            expected_result=$(awk '{print $0}' "$result_file")
             # Comparer les résultats évalués avec les résultats attendus
             if [ "$evaluated_test" != "$expected_result" ]; then
               echo "Les résultats ne correspondent pas pour le fichier $i"
