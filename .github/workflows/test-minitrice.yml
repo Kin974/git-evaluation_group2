@@ -25,9 +25,8 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
-            
             # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
-            evaluated_test=$(cat "$test_file" | python minitrice.py)
+            evaluated_test=$( 'print($0)' "$test_file" | python minitrice.py)
             # Lire les résultats attendus
             expected_result=$(cat "$result_file")
             # Comparer les résultats évalués avec les résultats attendus
