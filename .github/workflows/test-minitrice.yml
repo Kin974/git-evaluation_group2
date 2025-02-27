@@ -25,10 +25,15 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
-            # Utiliser bc pour évaluer les expressions arithmétiques dans le fichier de test
-            evaluated_test=$(awk '{print $0}' $test_file | bc | awk '{printf "%.1f\n", $1}')
+            # Vérifier si les fichiers existent
+            if [ ! -f "$test_file" ] || [ ! -f "$result_file" ]; then
+              echo "Fichier de test ou de résultat manquant pour $i"
+              exit 1
+            fi
+            # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
+            evaluated_test=$(cat "$test_file" | python minitrice.py)
             # Lire les résultats attendus
-            expected_result=$(awk '{printf "%.1f\n", $1}' $result_file)
+            expected_result=$(cat "$result_file")
             # Comparer les résultats évalués avec les résultats attendus
             if [ "$evaluated_test" != "$expected_result" ]; then
               echo "Les résultats ne correspondent pas pour le fichier $i"
