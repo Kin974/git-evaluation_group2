@@ -26,7 +26,7 @@ jobs:
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
             # Utiliser bc pour évaluer les expressions arithmétiques dans le fichier de test
-            evaluated_test=$(awk '{print $0}' $test_file | bc)
+            evaluated_test=$(awk '{print $0}' $test_file | bc | awk '{printf "%.1f\n", $1}')
             # Lire les résultats attendus
             expected_result=$(awk '{printf "%.1f\n", $1}' $result_file)
             # Comparer les résultats évalués avec les résultats attendus
