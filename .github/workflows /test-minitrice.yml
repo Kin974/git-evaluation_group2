@@ -25,11 +25,15 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
+            output_file="output_${i}.txt"
 
-            # Utiliser awk pour convertir les valeurs en flottant avec la partie décimale
-            if ! diff -q <(sort <(awk '{printf "%.1f\n", $1}' $test_file)) <(sort <(awk '{printf "%.1f\n", $1}' $result_file)); then
+            # Exécuter minitrice.py avec le fichier de test et stocker le résultat
+            python minitrice.py < "$test_file" > "$output_file"
+
+            # Comparer les résultats en s'assurant que les nombres entiers et flottants sont traités de manière équivalente
+            if ! diff -q <(sort <(awk '{printf "%.1f\n", $1}' "$output_file")) <(sort <(awk '{printf "%.1f\n", $1}' "$result_file")); then
               echo "Les résultats ne correspondent pas pour le fichier $i"
-              diff $test_file $result_file
+              diff "$output_file" "$result_file"
               exit 1
             fi
           done
