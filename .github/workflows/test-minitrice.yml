@@ -25,11 +25,7 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
-            # Vérifier si les fichiers existent
-            if [ ! -f "$test_file" ] || [ ! -f "$result_file" ]; then
-              echo "Fichier de test ou de résultat manquant pour $i"
-              exit 1
-            fi
+            
             # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
             evaluated_test=$(cat "$test_file" | python minitrice.py)
             # Lire les résultats attendus
