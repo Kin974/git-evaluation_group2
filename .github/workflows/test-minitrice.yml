@@ -25,13 +25,40 @@ jobs:
           for i in {00..10}; do
             test_file="test/${i}-*.txt"
             result_file="results/${i}-*.txt"
+            # Utiliser minitrice.py pour évaluer les expressions dans le fichier de test
+            evaluated_test=$(awk '{print $0}' $test_file | python minitrice.py 2>&1)
+            exit_code=$?  # Capture le code de sortie de minitrice.py
+            # Lire les résultats attendus 
+            expected_result=$(awk '{print $0}' $result_file)
 
-            # Utiliser awk pour convertir les valeurs en flottant avec la partie décimale
-            if ! diff -q <(sort <(awk '{printf "%.1f\n", $1}' $test_file)) <(sort <(awk '{printf "%.1f\n", $1}' $result_file)); then
-              echo "Les résultats ne correspondent pas pour le fichier $i"
-              diff $test_file $result_file
-              exit 1
+            echo "Test file : $test_file"
+            echo "Result file : $result_file"
+            echo "Évalué : $evaluated_test"
+            echo "Attendu : $expected_result"
+
+
+            # Comparer les résultats évalués avec les résultats attendus
+            if [ $exit_code -ne 0 ]; then
+            # Vérifier si l'erreur est attendue
+              if [ "$evaluated_test" != "$expected_result" ]; then
+                echo "Erreur non prévue !"
+                echo "Erreur reçue : $evaluated_test"
+                echo "Erreur attendue : $expected_result"
+                exit 1
+              else
+                # L'erreur correspond à l'erreur attendue, donc c'est un succès
+                echo "Erreur attendue pour $i : $evaluated_test"
+              fi
+            else
+              # Comparer les résultats ligne par ligne pour éviter les erreurs de format
+              paste <(echo "$evaluated_test") <(echo "$expected_result") | while IFS=$'\t' read -r eval_line exp_line; do
+                if [ "$eval_line" != "$exp_line" ]; then
+                  echo "Les résultats ne correspondent pas pour le fichier $i"
+                  echo "Ligne évaluée   : $eval_line"
+                  echo "Ligne attendue   : $exp_line"
+                  exit 1
+                fi
+              done
             fi
           done
-
           echo "Tous les résultats sont corrects !"
