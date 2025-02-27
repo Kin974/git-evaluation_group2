@@ -30,7 +30,11 @@ jobs:
             # Lire les résultats attendus 
             expected_result=$(awk '{print $0}' $result_file)
 
-            diff -u <(echo "$evaluated_test") <(echo "$expected_result")
+            echo "Test file : $test_file"
+            echo "Result file : $result_file"
+            echo "Évalué : $evaluated_test"
+            echo "Attendu : $expected_result"
+
 
             # Comparer les résultats évalués avec les résultats attendus
             if [ "$evaluated_test" != "$expected_result" ]; then
